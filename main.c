@@ -12,6 +12,7 @@ int ExtraireInformations(char ligne[], char** question, int* nbPropositions, cha
 char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne);
 int TirageAleatoire(int maximum, int tab[], int lgTab);
 void FreeTabQcm(char** tabQcm, int nbLignes);
+float RechercherMaximum(float tab[], int nbElements);
 
 
 int main() {
@@ -26,6 +27,7 @@ int main() {
     char** propositions;
     float* points;
     float total = 0;
+    float maxPoints = 0;
 
     nomFichier = LireChaineDynamique("Entrez le nom du fichier : ");
 
@@ -83,6 +85,7 @@ int main() {
         } while (reponse > nbPropositions || reponse < 1);
 
         total = total + points[reponse - 1];
+        maxPoints = maxPoints + RechercherMaximum(points, nbPropositions);
 
         free(question);
         for (i = 0; i < nbPropositions; i++) {
@@ -95,7 +98,7 @@ int main() {
     } while (questionsPosees < nbQuestions);
 
 
-    printf("Votre Total : %.2f", total);
+    printf("\nVotre Total : %.2f/%.2f", total, maxPoints);
 
     free(tabQuestionsPosees);
 
@@ -132,7 +135,8 @@ int ExtraireInformations(char ligne[], char** question, int* nbPropositions, cha
     ptrLigne = ptrLigne + strlen(*question) + 1;
 
     char* nbPropStr = RecupererToken(ptrLigne, DELIMITEUR);
-    int nbProp = atoi(nbPropStr);
+    int nbProp;
+    sscanf(nbPropStr, "%d", &nbProp);
     *nbPropositions = nbProp;
 
     ptrLigne = ptrLigne + strlen(nbPropStr) + 1;
@@ -148,7 +152,7 @@ int ExtraireInformations(char ligne[], char** question, int* nbPropositions, cha
 
     for (int i = 0; i < nbProp; i++) {
         (*propositions)[i] = RecupererToken(ptrLigne, DELIMITEUR);
-        ptrLigne += strlen((*propositions)[i]) + 1;
+        ptrLigne = ptrLigne + strlen((*propositions)[i]) + 1;
     }
 
     *points = (float*)malloc(nbProp * sizeof(float));
@@ -161,7 +165,7 @@ int ExtraireInformations(char ligne[], char** question, int* nbPropositions, cha
 
     for (int i = 0; i < nbProp; i++) {
         char* tmp = RecupererToken(ptrLigne, DELIMITEUR);
-        (*points)[i] = atof(tmp);
+        sscanf(tmp, "%f", &(*points)[i]);
         ptrLigne = ptrLigne + strlen(tmp) + 1;
         free(tmp);
     }
@@ -243,3 +247,17 @@ void FreeTabQcm(char** tabQcm, int nbLignes)
     free(tabQcm);
 }
 
+float RechercherMaximum(float tab[], int nbElements)
+{
+    float max = tab[0];
+
+    for(int i = 1; i<nbElements; i++)
+    {
+        if(tab[i] > tab[i-1])
+        {
+            max = tab[i];
+        }
+    }
+
+    return max;
+}
