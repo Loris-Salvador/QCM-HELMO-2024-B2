@@ -67,7 +67,7 @@ int main() {
             return 1;
         }
 
-        tabQuestionsPosees[i] = numLigne;
+        tabQuestionsPosees[questionsPosees] = numLigne;
 
         printf("\nQuestion: %s\n", question);
 
