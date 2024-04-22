@@ -1,0 +1,10 @@
+L'instruction C    int som=0 est une ?;3;affectation;declaration;initialisation;1;1;1
+Quel est le resultat du calcul (5+9)%4*2+8 ?;4;12;14;16;18;3;-1;-1;-1
+En C, quel est l'operateur logique qui signifie "est different de" ? ;4;<>;!=;><;=!;-1;3;-1;-1
+Quelle est la boucle recommandee si le nombre de passages dans celle-ci est connu ? ;3;for(   )...;do...while(    );while(   )...;2;-1;-1
+Si i et j sont des variables entieres telles que i=3 et j=5 quel sera le resutat de (float)(i/j) ? ;2;0.00;0.60;1;-1
+Dans quelle librairie est declaree la fonction srand() qui initialise le generateur de nombres aleatoires ? ;3;stdio.h;stdlib.h;time.h;-1;2;-1
+Quelle est l'instruction qui permet d'obtenir un nombre entier aleatoire entre min et max (bornes incluses) ? ;4;min+rand()%(max-min+1);max-rand()%(max-min+1);min+rand()%max;rand()%(max-min);1;1;-1;-1
+Quels sont les entetes possibles pour une fonction qui renvoie un vecteur contenant les elements differents d'une matrice ? ;4;int ElementsDifferents(int nlig, int nbcol, float mat[][NBCOLMAX], float vec[]);void ElementsDifferents(int nlig, int nbcol, float mat[][NBCOLMAX], int *dim, float vec[]);int ElementsDifferents(int nlig, int nbcol, float mat[][], float vec[]);int ElementsDifferents(int nlig, int nbcol, float mat[][NBCOLMAX], int vec[]);1;1;-1;-1
+Si la variable  chaine  a ete declaree par   char chaine[31]   et initialisee par chaine[0]='\0'    quelles sont les instructions qui permettent d'y memoriser le mot bonjour ?;5;strcpy(chaine,"bonjour");strcat(chaine,"bonjour");sprintf(chaine,"%s","bonjour");chaine="bonjour";strcpy(chaine,'bonjour');1;1;1;-2;-1
+Si variables sont declarees par float a, int b, char op, char fin[31]     quelle sera la valeur renvoyee par   sscanf("3.0*4.5","%f%c%d", &a,&op,&b) ? ;4;12;13.5;2;3;-1;-1;-1;3

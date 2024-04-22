@@ -1,41 +1,105 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include "lecture/lecture.h"
 
 #define DELIMITEUR ';'
+#define LGMAXLIGNE 512
 
 char* RecupererToken(char chaine[], char delimiteur);
-void ExtraireInformations(char ligne[], char** question, int* nbPropositions, char*** propositions, float** points);
+int ExtraireInformations(char ligne[], char** question, int* nbPropositions, char*** propositions, float** points);
+char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne);
+int TirageAleatoire(int maximum, int tab[], int lgTab);
+void FreeTabQcm(char** tabQcm, int nbLignes);
+
 
 int main() {
 
-    char ligne[] = "Quelle est la capitale de la Belgique ?;3;Liege;Anvers;Bruxelles;-0.5;-0.5;1";
+    srand(time(NULL));
+
+    int nbQuestions, nbLignes, numLigne, reponse, nbPropositions, retour;
+    int i = 0, questionsPosees = 0;
+    int* tabQuestionsPosees;
     char* question;
-    int nbPropositions;
+    char* nomFichier;
     char** propositions;
     float* points;
+    float total = 0;
 
-    ExtraireInformations(ligne, &question, &nbPropositions, &propositions, &points);
+    nomFichier = LireChaineDynamique("Entrez le nom du fichier : ");
 
-    printf("\nQuestion: %s\n", question);
-    printf("Nombre de propositions: %d\n", nbPropositions);
-
-    printf("Propositions:\n");
-    for (int i = 0; i < nbPropositions; i++) {
-        printf("%s\n", propositions[i]);
+    char** tabQcm = ExtraireFichierEnTableau(nomFichier, &nbLignes);
+    free(nomFichier);
+    if(tabQcm == NULL)
+    {
+        return 1;
     }
 
-    printf("Points:\n");
-    for (int i = 0; i < nbPropositions; i++) {
-        printf("%.1f\n", points[i]);
+
+    do
+    {
+        LireEntier("\nCombien de questions voulez-vous : ", &nbQuestions);
+        if(nbQuestions > nbLignes)
+        {
+            printf("Il n'y a pas assez de questions dans le fichier !");
+        }
+    } while (nbQuestions > nbLignes);
+
+    tabQuestionsPosees = (int*)malloc(nbQuestions * sizeof(int));
+    if (tabQuestionsPosees == NULL) {
+        FreeTabQcm(tabQcm, nbLignes);
+        printf("Erreur d'allocation Tableau questions posees.\n");
+        return 1;
     }
 
-    for (int i = 0; i < nbPropositions; i++) {
-        free(propositions[i]);
-    }
+    do
+    {
+        numLigne = TirageAleatoire(nbLignes, tabQuestionsPosees, nbQuestions);
 
-    free(propositions);
-    free(points);
+        retour = ExtraireInformations(tabQcm[numLigne], &question, &nbPropositions, &propositions, &points);
+        if(retour == 1)
+        {
+            free(tabQuestionsPosees);
+            FreeTabQcm(tabQcm, nbLignes);
+            return 1;
+        }
+
+        tabQuestionsPosees[i] = numLigne;
+
+        printf("\nQuestion: %s\n", question);
+
+        printf("\nPropositions :\n");
+        for (i = 0; i < nbPropositions; i++) {
+            printf("%d : %s\n", i + 1, propositions[i]);
+        }
+
+        do {
+            LireEntier("\nVotre Reponse : ", &reponse);
+            if(reponse > nbPropositions || reponse < 1 )
+            {
+                printf("Aucune propositions ne correspond");
+            }
+        } while (reponse > nbPropositions || reponse < 1);
+
+        total = total + points[reponse - 1];
+
+        free(question);
+        for (i = 0; i < nbPropositions; i++) {
+            free(propositions[i]);
+        }
+        free(propositions);
+        free(points);
+
+        questionsPosees++;
+    } while (questionsPosees < nbQuestions);
+
+
+    printf("Votre Total : %.2f", total);
+
+    free(tabQuestionsPosees);
+
+    FreeTabQcm(tabQcm, nbLignes);
 
     return 0;
 }
@@ -48,8 +112,7 @@ char* RecupererToken(char chaine[], char delimiteur) {
 
     char* token = (char*)malloc((i + 1) * sizeof(char));
     if (token == NULL) {
-        printf("Erreur d'allocation.\n");
-        exit(1);
+        return NULL;
     }
 
     strncpy(token, chaine, i);
@@ -57,35 +120,126 @@ char* RecupererToken(char chaine[], char delimiteur) {
     return token;
 }
 
-void ExtraireInformations(char ligne[], char** question, int* nbPropositions, char*** propositions, float** points) {
+int ExtraireInformations(char ligne[], char** question, int* nbPropositions, char*** propositions, float** points) {
     char* ptrLigne = ligne;
 
     *question = RecupererToken(ptrLigne, DELIMITEUR);
+    if (question == NULL) {
+        printf("Erreur d'allocation Token question.\n");
+        return 1;
+    }
 
     ptrLigne = ptrLigne + strlen(*question) + 1;
 
-    char* nbProp = RecupererToken(ptrLigne, DELIMITEUR);
+    char* nbPropStr = RecupererToken(ptrLigne, DELIMITEUR);
+    int nbProp = atoi(nbPropStr);
+    *nbPropositions = nbProp;
 
-    int nbPropInt = atoi(nbProp);
-    *nbPropositions = nbPropInt;
+    ptrLigne = ptrLigne + strlen(nbPropStr) + 1;
 
-    ptrLigne = ptrLigne + strlen(nbProp) + 1;
+    free(nbPropStr);
 
-    free(nbProp);
+    *propositions = (char**)malloc(nbProp * sizeof(char*));
+    if (question == NULL) {
+        free(*question);
+        printf("Erreur d'allocation propositions.\n");
+        return 1;
+    }
 
-    *propositions = (char**)malloc(nbPropInt * sizeof(char*));
-
-    for (int i = 0; i < nbPropInt; i++) {
+    for (int i = 0; i < nbProp; i++) {
         (*propositions)[i] = RecupererToken(ptrLigne, DELIMITEUR);
         ptrLigne += strlen((*propositions)[i]) + 1;
     }
 
-    *points = (float*)malloc(nbPropInt * sizeof(float));
+    *points = (float*)malloc(nbProp * sizeof(float));
+    if (question == NULL) {
+        free(*propositions);
+        free(*question);
+        printf("Erreur d'allocation points.\n");
+        return 1;
+    }
 
-    for (int i = 0; i < nbPropInt; i++) {
+    for (int i = 0; i < nbProp; i++) {
         char* tmp = RecupererToken(ptrLigne, DELIMITEUR);
         (*points)[i] = atof(tmp);
         ptrLigne = ptrLigne + strlen(tmp) + 1;
         free(tmp);
     }
+
+    return 0;
 }
+
+char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne)
+{
+    FILE* fp;
+    char** tab;
+    char ligne[LGMAXLIGNE];
+
+    fp = fopen(nomFichier, "r");
+    if (fp == NULL)
+    {
+        printf("Impossible d'ouvrir le fichier !\n");
+        return NULL;
+    }
+
+    *nbLigne = 0;
+    while(fgets(ligne, LGMAXLIGNE + 1, fp) != NULL)
+    {
+        (*nbLigne)++;
+    }
+
+    tab = malloc((*nbLigne) * sizeof(char*));
+    if (tab == NULL)
+    {
+        printf("Erreur d'allocation tableau\n");
+        return NULL;
+    }
+
+    rewind(fp);
+    int i = 0;
+
+    while(fgets(ligne, LGMAXLIGNE + 1, fp) != NULL)
+    {
+        tab[i] = malloc((strlen(ligne) + 1) * sizeof(char));
+        if (tab[i] == NULL)
+        {
+            printf("Erreur d'allocation ligne\n");
+            return NULL;
+        }
+        strcpy(tab[i], ligne);
+        tab[i][strlen(ligne)] = '\0';
+        i++;
+    }
+
+    fclose(fp);
+    return tab;
+}
+
+int TirageAleatoire(int maximum, int tab[], int lgTab) {
+    int retry, nb;
+
+    do
+    {
+        retry = 0;
+        nb =  rand() % maximum;
+
+        for(int i = 0; i < lgTab; i++)
+        {
+            if(nb == tab[i])
+            {
+                retry = 1;
+            }
+        }
+    } while (retry == 1);
+
+    return nb;
+}
+
+void FreeTabQcm(char** tabQcm, int nbLignes)
+{
+    for (int i = 0; i < nbLignes; i++) {
+        free(tabQcm[i]);
+    }
+    free(tabQcm);
+}
+
