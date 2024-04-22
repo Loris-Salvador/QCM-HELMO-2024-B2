@@ -10,7 +10,7 @@
 char* RecupererToken(char chaine[], char delimiteur);
 int ExtraireInformations(char ligne[], char** question, int* nbPropositions, char*** propositions, float** points);
 char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne);
-int TirageAleatoire(int maximum, int tab[], int lgTab);
+int TirageAleatoire(int maximum, int tab[], int nbElements);
 void FreeTabQcm(char** tabQcm, int nbLignes);
 float RechercherMaximum(float tab[], int nbElements);
 
@@ -218,7 +218,7 @@ char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne)
     return tab;
 }
 
-int TirageAleatoire(int maximum, int tab[], int lgTab) {
+int TirageAleatoire(int maximum, int tab[], int nbElements) {
     int retry, nb;
 
     do
@@ -226,7 +226,7 @@ int TirageAleatoire(int maximum, int tab[], int lgTab) {
         retry = 0;
         nb =  rand() % maximum;
 
-        for(int i = 0; i < lgTab; i++)
+        for(int i = 0; i < nbElements; i++)
         {
             if(nb == tab[i])
             {
