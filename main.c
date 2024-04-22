@@ -38,7 +38,6 @@ int main() {
         return 1;
     }
 
-
     do
     {
         LireEntier("\nCombien de questions voulez-vous : ", &nbQuestions);
