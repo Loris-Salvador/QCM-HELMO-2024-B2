@@ -99,7 +99,7 @@ int main() {
     } while (questionsPosees < nbQuestions);
 
 
-    printf("\nVotre Total : %.2f/%.2f", total, maxPoints);
+    printf("\nVotre Total : %.2f/%.2f", total, maxPoints); // est-ce que le total peut etre negatif? si non il faudra changer (un bete if(total < 0) total = 0;)
 
     free(tabQuestionsPosees);
 
