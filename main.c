@@ -19,8 +19,8 @@ int main() {
 
     srand(time(NULL));
 
-    int nbQuestions, nbLignes, numLigne, reponse, nbPropositions, retour;
-    int i = 0, questionsPosees = 0;
+    int nbQuestions, nbLignes, numLigne, reponse, nbPropositions, retour, i;
+    int questionsPosees = 0;
     int* tabQuestionsPosees;
     char* question;
     char* nomFichier;
