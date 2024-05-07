@@ -30,6 +30,7 @@ int main() {
     float* points;
     float total = 0;
     float maxPoints = 0;
+    char rejouer;
 
     nomFichier = LireChaineDynamique("Entrez le nom du fichier : ");
 
@@ -42,66 +43,80 @@ int main() {
 
     do
     {
-        LireEntier("\nCombien de questions voulez-vous : ", &nbQuestions);
-        if(nbQuestions > nbLignes)
+        do
         {
-            printf("Il n'y a pas assez de questions dans le fichier !");
-        }
-    } while (nbQuestions > nbLignes);
+            LireEntier("\nCombien de questions voulez-vous : ", &nbQuestions);
+            if (nbQuestions > nbLignes)
+            {
+                printf("Il n'y a pas assez de questions dans le fichier !");
+            }
+        } while (nbQuestions > nbLignes);
 
-    tabQuestionsPosees = (int*)malloc(nbQuestions * sizeof(int));
-    if (tabQuestionsPosees == NULL) {
-        FreeTabQcm(tabQcm, nbLignes);
-        printf("Erreur d'allocation Tableau questions posees.\n");
-        return 1;
-    }
-
-    do
-    {
-        numLigne = TirageAleatoire(nbLignes, tabQuestionsPosees, nbQuestions);
-
-        retour = ExtraireInformations(tabQcm[numLigne], &question, &nbPropositions, &propositions, &points);
-        if(retour == 1)
-        {
-            free(tabQuestionsPosees);
+        tabQuestionsPosees = (int*)malloc(nbQuestions * sizeof(int));
+        if (tabQuestionsPosees == NULL) {
             FreeTabQcm(tabQcm, nbLignes);
+            printf("Erreur d'allocation Tableau questions posees.\n");
             return 1;
         }
 
-        tabQuestionsPosees[questionsPosees] = numLigne;
+        do
+        {
+            numLigne = TirageAleatoire(nbLignes, tabQuestionsPosees, nbQuestions);
 
-        printf("\nQuestion: %s\n", question);
-
-        printf("\nPropositions :\n");
-        for (i = 0; i < nbPropositions; i++) {
-            printf("%d : %s\n", i + 1, propositions[i]);
-        }
-
-        do {
-            LireEntier("\nVotre Reponse : ", &reponse);
-            if(reponse > nbPropositions || reponse < 1 )
+            retour = ExtraireInformations(tabQcm[numLigne], &question, &nbPropositions, &propositions, &points);
+            if (retour == 1)
             {
-                printf("Aucune propositions ne correspond");
+                free(tabQuestionsPosees);
+                FreeTabQcm(tabQcm, nbLignes);
+                return 1;
             }
-        } while (reponse > nbPropositions || reponse < 1);
 
-        total = total + points[reponse - 1];
-        maxPoints = maxPoints + RechercherMaximum(points, nbPropositions);
+            tabQuestionsPosees[questionsPosees] = numLigne;
 
-        free(question);
-        for (i = 0; i < nbPropositions; i++) {
-            free(propositions[i]);
+            printf("\nQuestion: %s\n", question);
+
+            printf("\nPropositions :\n");
+            for (i = 0; i < nbPropositions; i++) {
+                printf("%d : %s\n", i + 1, propositions[i]);
+            }
+
+            do {
+                LireEntier("\nVotre Reponse : ", &reponse);
+                if (reponse > nbPropositions || reponse < 1)
+                {
+                    printf("Aucune propositions ne correspond");
+                }
+            } while (reponse > nbPropositions || reponse < 1);
+
+            total = total + points[reponse - 1];
+            maxPoints = maxPoints + RechercherMaximum(points, nbPropositions);
+
+            free(question);
+            for (i = 0; i < nbPropositions; i++) {
+                free(propositions[i]);
+            }
+            free(propositions);
+            free(points);
+
+            questionsPosees++;
+        } while (questionsPosees < nbQuestions);
+
+
+        printf("\nVotre Total : %.2f/%.2f", total, maxPoints); // est-ce que le total peut etre negatif? si non il faudra changer (un bete if(total < 0) total = 0;)
+
+        LireCaractere("\n\nVoulez vous rejouer? (O/N)", &rejouer);
+
+        if (rejouer == 'O')
+        {
+            total = 0;
+            questionsPosees = 0;
+            maxPoints = 0;
+            system("cls");
         }
-        free(propositions);
-        free(points);
 
-        questionsPosees++;
-    } while (questionsPosees < nbQuestions);
+        free(tabQuestionsPosees);
 
-
-    printf("\nVotre Total : %.2f/%.2f", total, maxPoints); // est-ce que le total peut etre negatif? si non il faudra changer (un bete if(total < 0) total = 0;)
-
-    free(tabQuestionsPosees);
+    } while (rejouer == 'O');
 
     FreeTabQcm(tabQcm, nbLignes);
 
@@ -254,7 +269,7 @@ float RechercherMaximum(float tab[], int nbElements)
 
     for(int i = 1; i<nbElements; i++)
     {
-        if(tab[i] > tab[i-1])
+        if(tab[i] > max)
         {
             max = tab[i];
         }
