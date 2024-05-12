@@ -223,6 +223,7 @@ char ** ExtraireFichierEnTableau(char nomFichier[], int* nbLigne)
         tab[i] = malloc((strlen(ligne) + 1) * sizeof(char));
         if (tab[i] == NULL)
         {
+            free(tab);
             printf("Erreur d'allocation ligne\n");
             return NULL;
         }
