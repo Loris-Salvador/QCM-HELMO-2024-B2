@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 #include "lecture.h"
 //#include "..\..\Modules\Chaine 2(S17)\lecture.h"// bibliotheque du prof fonction du prof
 
@@ -90,9 +91,9 @@ int main() {
 
             do {
                 LireEntier("\nVotre Reponse : ", &reponse);
-                if (reponse > nbPropositions || reponse < 1) // || ==OU
+                if (reponse > nbPropositions || reponse < 1 || isdigit(reponse)) // || ==OU
                 {
-                    printf("Aucune propositions ne correspond");
+                    printf("Reponse invalide\n");
                 }
             } while (reponse > nbPropositions || reponse < 1);
 
@@ -105,6 +106,7 @@ int main() {
             }
             free(propositions); // libere le tableau 
             free(points);
+            free(tabOrdreProposition);
 
             questionsPosees++;
         } while (questionsPosees < nbQuestions);
